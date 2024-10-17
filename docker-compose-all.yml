@@ -1,0 +1,71 @@
+services:
+  mariadb:
+    image: docker.io/bitnami/mariadb:11.4
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=bn_moodle
+      - MARIADB_DATABASE=bitnami_moodle
+      - MARIADB_CHARACTER_SET=utf8mb4
+      - MARIADB_COLLATE=utf8mb4_unicode_ci
+    volumes:
+      - "mariadb_data:/bitnami/mariadb"
+
+  moodle:
+    image: docker.io/bitnami/moodle:4.4
+    ports:
+      - "80:8080"
+      - "443:8443"
+    environment:
+      - MOODLE_DATABASE_HOST=mariadb
+      - MOODLE_DATABASE_PORT_NUMBER=3306
+      - MOODLE_DATABASE_USER=bn_moodle
+      - MOODLE_DATABASE_NAME=bitnami_moodle
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - "moodle_data:/bitnami/moodle"
+      - "moodledata_data:/bitnami/moodledata"
+    depends_on:
+      - mariadb
+
+  learninglocker:
+    image: ghcr.io/kromiii/learninglocker:latest
+    container_name: learninglocker
+    depends_on:
+      - learninglocker-mongo
+      - learninglocker-redis
+    ports:
+      - "3000:3000"
+      - "8082:8080"
+      - "8081:8081"
+    volumes:
+      - .env.learninglocker:/usr/local/src/learninglocker/.env
+      - .env.xapi-service:/usr/local/src/xapi-service/.env
+    working_dir: /usr/local/src/learninglocker
+    command: bash -c "source ~/.bashrc && yarn migrate && pm2 start pm2/all.json && cd ../xapi-service && pm2 start pm2/xapi.json && pm2 logs"
+
+  learninglocker-mongo:
+    image: mongo:4.0.8
+    container_name: learninglocker-mongo
+    restart: always
+    volumes:
+      - learninglocker-mongo:/data/db
+
+  learninglocker-redis:
+    image: redis:5.0.4
+    container_name: learninglocker-redis
+    restart: always
+    volumes:
+      - learninglocker-redis:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  mariadb_data:
+    driver: local
+  moodle_data:
+    driver: local
+  moodledata_data:
+    driver: local
+  learninglocker-mongo:
+  learninglocker-redis:
