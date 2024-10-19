@@ -27,8 +27,6 @@ services:
       - 'moodledata_data:/bitnami/moodledata'
     depends_on:
       - mariadb
-    networks:
-      - shared-network
 volumes:
   mariadb_data:
     driver: local
@@ -37,6 +35,3 @@ volumes:
   moodledata_data:
     driver: local
 
-networks:
-  shared-network:
-    external: true

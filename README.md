@@ -3,18 +3,30 @@
 ## LMS (moodle) の起動
 
 ```
-docker compose up -d
+docker compose -f moodle/docker-compose.yml up -d
 ```
 
 http://localhost でアクセスできる
 
+user と password は user/bitnami
+
 ## LRS (Learning Locker) の起動
 
 ```
-docker compose -f docker-compose-all.yml up -d
+docker compose -f learninglocker/docker-compose.yml up -d
 ```
 
 http://localhost:3000 で Learning Locker の Dashboard にアクセスできます
+
+## Dashboard (superset) の起動
+
+```
+docker compose -f superset/docker-compose.yml up -d
+```
+
+http://localhost:8088 で Superset の Dashboard にアクセスできます
+
+user と password は admin/admin
 
 ## LRS (Learning Locker) の設定
 
