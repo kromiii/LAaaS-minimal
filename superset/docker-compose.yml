@@ -3,8 +3,8 @@ version: '3'
 services:
   superset:
     build:
-      context: ./superset
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./Dockerfile
     container_name: superset
     environment:
       - ADMIN_USERNAME=admin
@@ -14,13 +14,14 @@ services:
       - DATABASE_HOST=superset-postgres
       - DATABASE_PASSWORD=superset
       - DATABASE_USER=superset
+      - SUPERSET_SECRET_KEY=350303eb25fe0c874be356261c15642d1bf289635e6e4465
     ports:
       - '8088:8088'
     depends_on:
       - superset-postgres
 
   superset-postgres:
-    image: postgres:13
+    image: postgres:15
     container_name: superset_postgres
     environment:
       - POSTGRES_DB=superset
