@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  superset:
+    build:
+      context: ./superset
+      dockerfile: Dockerfile
+    container_name: superset
+    environment:
+      - ADMIN_USERNAME=admin
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=admin
+      - DATABASE_DB=superset
+      - DATABASE_HOST=superset-postgres
+      - DATABASE_PASSWORD=superset
+      - DATABASE_USER=superset
+    ports:
+      - '8088:8088'
+    depends_on:
+      - superset-postgres
+
+  superset-postgres:
+    image: postgres:13
+    container_name: superset_postgres
+    environment:
+      - POSTGRES_DB=superset
+      - POSTGRES_PASSWORD=superset
+      - POSTGRES_USER=superset
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    name: superset-postgres

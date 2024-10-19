@@ -32,4 +32,6 @@ services:
 
 volumes:
   learninglocker-mongo:
+    name: learninglocker-mongo
   learninglocker-redis:
+    name: learninglocker-redis
