@@ -12,6 +12,8 @@ services:
     volumes:
       - .env.learninglocker:/usr/local/src/learninglocker/.env
       - .env.xapi-service:/usr/local/src/xapi-service/.env
+    networks:
+      - learning-analytics-at-home
     working_dir: /usr/local/src/learninglocker
     command: bash -c "source ~/.bashrc && yarn migrate && pm2 start pm2/all.json && cd ../xapi-service && pm2 start pm2/xapi.json && pm2 logs"
 
@@ -21,6 +23,8 @@ services:
     restart: always
     volumes:
       - learninglocker-mongo:/data/db
+    networks:
+      - learning-analytics-at-home
 
   learninglocker-redis:
     image: redis:5.0.4
@@ -28,6 +32,8 @@ services:
     restart: always
     volumes:
       - learninglocker-redis:/data
+    networks:
+      - learning-analytics-at-home
     command: redis-server --appendonly yes
 
 volumes:
@@ -35,3 +41,8 @@ volumes:
     name: learninglocker-mongo
   learninglocker-redis:
     name: learninglocker-redis
+
+networks:
+  learning-analytics-at-home:
+    name: learning-analytics-at-home
+    driver: bridge
