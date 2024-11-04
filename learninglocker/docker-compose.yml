@@ -1,34 +1,4 @@
 services:
-  mariadb:
-    image: docker.io/bitnami/mariadb:11.4
-    environment:
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_USER=bn_moodle
-      - MARIADB_DATABASE=bitnami_moodle
-      - MARIADB_CHARACTER_SET=utf8mb4
-      - MARIADB_COLLATE=utf8mb4_unicode_ci
-    volumes:
-      - "mariadb_data:/bitnami/mariadb"
-
-  moodle:
-    image: docker.io/bitnami/moodle:4.4
-    ports:
-      - "80:8080"
-      - "443:8443"
-    environment:
-      - MOODLE_DATABASE_HOST=mariadb
-      - MOODLE_DATABASE_PORT_NUMBER=3306
-      - MOODLE_DATABASE_USER=bn_moodle
-      - MOODLE_DATABASE_NAME=bitnami_moodle
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - "moodle_data:/bitnami/moodle"
-      - "moodledata_data:/bitnami/moodledata"
-    depends_on:
-      - mariadb
-
   learninglocker:
     image: ghcr.io/kromiii/learninglocker:latest
     container_name: learninglocker
@@ -42,6 +12,8 @@ services:
     volumes:
       - .env.learninglocker:/usr/local/src/learninglocker/.env
       - .env.xapi-service:/usr/local/src/xapi-service/.env
+    networks:
+      - learning-analytics-at-home
     working_dir: /usr/local/src/learninglocker
     command: bash -c "source ~/.bashrc && yarn migrate && pm2 start pm2/all.json && cd ../xapi-service && pm2 start pm2/xapi.json && pm2 logs"
 
@@ -51,6 +23,8 @@ services:
     restart: always
     volumes:
       - learninglocker-mongo:/data/db
+    networks:
+      - learning-analytics-at-home
 
   learninglocker-redis:
     image: redis:5.0.4
@@ -58,14 +32,17 @@ services:
     restart: always
     volumes:
       - learninglocker-redis:/data
+    networks:
+      - learning-analytics-at-home
     command: redis-server --appendonly yes
 
 volumes:
-  mariadb_data:
-    driver: local
-  moodle_data:
-    driver: local
-  moodledata_data:
-    driver: local
   learninglocker-mongo:
+    name: learninglocker-mongo
   learninglocker-redis:
+    name: learninglocker-redis
+
+networks:
+  learning-analytics-at-home:
+    name: learning-analytics-at-home
+    driver: bridge
