@@ -3,7 +3,7 @@
 ## LMS (moodle) の起動
 
 ```
-docker compose -f moodle/docker-compose.yml up -d
+make start-moodle
 ```
 
 http://localhost でアクセスできる
@@ -13,20 +13,18 @@ user と password は user/bitnami
 ## LRS (Learning Locker) の起動
 
 ```
-docker compose -f learninglocker/docker-compose.yml up -d
+make start-learninglocker
 ```
 
-http://localhost:3000 で Learning Locker の Dashboard にアクセスできます
+http://localhost:3000 で Learning Locker の Dashboard にアクセスできる
 
-## Dashboard (superset) の起動
+## Jupyter Notebook の起動
 
 ```
-docker compose -f superset/docker-compose.yml up -d
+make start-jupyter
 ```
 
-http://localhost:8088 で Superset の Dashboard にアクセスできます
-
-user と password は admin/admin
+http://localhost:8888 で Jupyter Notebook にアクセスできる
 
 ## LRS (Learning Locker) の設定
 
@@ -48,7 +46,7 @@ http://learninglocker:8081/data/xAPI/statements
 
 この状態でmoodleを操作するとログがLRSに保存されるはず
 
-デバッグ用のコマンド
+上記でうまくいかない人向けのデバッグ用のコマンド
 
 ```
 curl -X POST http://learninglocker:8081/data/xAPI/statements \
